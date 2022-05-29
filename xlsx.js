@@ -7680,6 +7680,12 @@ function write_ws_xml_cols(ws, cols) {
   o[o.length] = "</cols>";
   return o.join("");
 }
+function write_ws_xml_sheetviews(ws, opts, idx, wb) {
+	var sview = ({workbookViewId:"0"});
+	// $FlowIgnore
+	if((((wb||{}).Workbook||{}).Views||[])[0]) sview.rightToLeft = wb.Workbook.Views[0].RTL ? "1" : "0";
+	return writextag("sheetViews", writextag("sheetView", null, sview), {});
+}
 
 function write_ws_xml_cell(cell, ref, ws, opts, idx, wb) {
   if (cell.v === undefined && cell.s === undefined) return "";
@@ -7925,7 +7931,8 @@ function write_ws_xml(idx, opts, wb) {
     tabSelected: opts.tabSelected === undefined ? '0' : opts.tabSelected,  // see issue #26, need to set WorkbookViews if this is set
     workbookViewId: opts.workbookViewId === undefined ? '0' : opts.workbookViewId
   });
-  o[o.length] = writextag('sheetViews', sheetView);
+//   o[o.length] = writextag('sheetViews', sheetView);
+   o[o.length] = write_ws_xml_sheetviews(ws, opts, idx, wb);
 
   if (ws['!cols'] !== undefined && ws['!cols'].length > 0) o[o.length] = (write_ws_xml_cols(ws, ws['!cols']));
   o[sidx = o.length] = '<sheetData/>';
